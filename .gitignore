@@ -1,0 +1,14 @@
+# OS generated files #
+######################
+Icon
+.DS_Store
+
+# Sass generated #
+##################
+.sass-cache
+
+# Sublime Text #
+################
+sftp-settings.json
+*.sublime-project
+*.sublime-workspace
