@@ -14,6 +14,7 @@ $grider-gutter: 30px;
 
 // Wether or not to generate classes
 $grider-generate: true;
+$grider-generate-utilities: true;
 
 // Classes names and prefixes
 $grider-container-name: 'container';
@@ -28,7 +29,14 @@ $grider-breakpoints: (
 	xs: 0,
 	sm: 768,
 	md: 992,
-	lg: 1200,
+	lg: 1200
+);
+
+// Display property values
+$grider-properties: (
+	1: inline,
+	2: inline-block,
+	3: block
 );
 
 ////////////////////////
@@ -99,6 +107,16 @@ $grider-breakpoints: (
 	margin-left: (100% / $grider-columns) * $column;
 }
 
+// Visible utility
+@mixin grider-visible ($property) {
+	display: $property;
+}
+
+// Hidden utility
+@mixin grider-hidden {
+	display: none;
+}
+
 // Clearfix for the container and row
 @mixin grider-clearfix {
 	&:after {
@@ -128,23 +146,40 @@ $grider-breakpoints: (
 	}
 
 	// Columns classes
-	@each $key, $value in $grider-breakpoints {
+	@each $breakpoint-key, $breakpoint-value in $grider-breakpoints {
 		$column: $grider-columns;
-		@include grider-respond($value) {
+		@include grider-respond($breakpoint-value) {
 			@while $column > 0 {
-				.#{$grider-column-name}#{$key}-#{$column} {
+				.#{$grider-column-name}#{$breakpoint-key}-#{$column} {
 					@include grider-column($column);
 				}
-				.#{$grider-column-name}#{$key}-#{$grider-pull-prefix}#{$grider-columns} {
+				.#{$grider-column-name}#{$breakpoint-key}-#{$grider-pull-prefix}#{$grider-columns} {
 					@include grider-pull($column);
 				}
-				.#{$grider-column-name}#{$key}-#{$grider-push-prefix}#{$grider-columns} {
+				.#{$grider-column-name}#{$breakpoint-key}-#{$grider-push-prefix}#{$grider-columns} {
 					@include grider-push($column);
 				}
-				.#{$grider-column-name}#{$key}-#{$grider-offset-prefix}#{$grider-columns} {
+				.#{$grider-column-name}#{$breakpoint-key}-#{$grider-offset-prefix}#{$grider-columns} {
 					@include grider-offset($column);
 				}
 				$column: $column - 1;
+			}
+		}
+
+	}
+
+	@if $grider-generate-utilities {
+		// Utilities classes
+		@each $breakpoint-key, $breakpoint-value in $grider-breakpoints {
+			@include grider-respond($breakpoint-value) {
+				@each $property-key, $property-value in $grider-properties {
+					.visible-#{$breakpoint-key}-#{$property-value} {
+						@include grider-visible($property-value);
+					}
+				}
+				.hidden-#{$breakpoint-key} {
+					@include grider-hidden;
+				}
 			}
 		}
 	}
