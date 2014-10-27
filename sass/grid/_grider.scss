@@ -1,0 +1,152 @@
+////////////////////////
+// Grid Settings
+//
+// The whole output and settings of the grid can be modified using these variables
+////////////////////////
+
+
+// Basic settings
+$grider-unit: px;
+$grider-width: 1200px;
+$grider-columns: 12;
+$grider-gutter: 30px;
+
+
+// Wether or not to generate classes
+$grider-generate: true;
+
+// Classes names and prefixes
+$grider-container-name: 'container';
+$grider-row-name: 'row';
+$grider-column-name: 'col-';
+$grider-pull-prefix: 'pull-';
+$grider-push-prefix: 'push-';
+$grider-offset-prefix: 'offset-';
+
+// Breakpoints and names for classes
+$grider-breakpoints: (
+	xs: 0,
+	sm: 768,
+	md: 992,
+	lg: 1200,
+);
+
+////////////////////////
+// Grid Mixins
+//
+// Mixins providing the output for the grid, can be used separately
+////////////////////////
+
+
+// Create media breakpoints for the output
+@mixin grider-respond ($width) {
+	@if $width == 0 {
+		@content;
+	} @else {
+		@media (min-width: #{$width}#{$grider-unit}) {
+			@content;
+		}
+	}
+}
+
+// Main container setting the width
+@mixin grider-container ($gutter: $grider-gutter) {
+	box-sizing: border-box;
+	margin-right: auto;
+	margin-left: auto;
+	padding-left: $gutter / 2;
+	padding-right: $gutter / 2;
+
+	@each $key, $value in $grider-breakpoints {
+		@include grider-respond($value) {
+			width: $value - $gutter;
+		}
+	}
+}
+
+// Row holding the columns
+@mixin grider-row ($gutter: $grider-gutter) {
+	box-sizing: border-box;
+	margin-left: $gutter / 2;
+	margin-right: $gutter / 2;
+	@include grider-clearfix;
+}
+
+// Columns
+@mixin grider-column ($column, $gutter: $grider-gutter) {
+	box-sizing: border-box;
+	float: left;
+	min-height: 1px;
+	padding-left: $gutter / 2;
+	padding-right: $gutter / 2;
+	position: relative;
+	width: (100% / $grider-columns) * $column;
+	@include grider-clearfix;
+}
+
+// Pulls columns
+@mixin grider-pull ($column) {
+	right: (100% / $grider-columns) * $column;
+}
+
+// Pushes columns
+@mixin grider-push ($column) {
+	left: (100% / $grider-columns) * $column;
+}
+
+// Offsets columns
+@mixin grider-offset ($column) {
+	margin-left: (100% / $grider-columns) * $column;
+}
+
+// Clearfix for the container and row
+@mixin grider-clearfix {
+	&:after {
+		content: " ";
+		display: block;
+		clear: both;
+	}
+}
+
+////////////////////////
+// Grid Classes
+//
+// If $grider-generate is set to true this will generate classes for the grid so you can use them in the markup
+////////////////////////
+
+
+@if $grider-generate {
+
+	// Container class
+	.#{$grider-container-name} {
+		@include grider-container;
+	}
+
+	// Row class
+	.#{$grider-row-name} {
+		@include grider-row;
+	}
+
+	// Columns classes
+	@each $key, $value in $grider-breakpoints {
+		$column: $grider-columns;
+		@include grider-respond($value) {
+			@while $column > 0 {
+				.#{$grider-column-name}#{$key}-#{$column} {
+					@include grider-column($column);
+				}
+				.#{$grider-column-name}#{$key}-#{$grider-pull-prefix}#{$grider-columns} {
+					@include grider-pull($column);
+				}
+				.#{$grider-column-name}#{$key}-#{$grider-push-prefix}#{$grider-columns} {
+					@include grider-push($column);
+				}
+				.#{$grider-column-name}#{$key}-#{$grider-offset-prefix}#{$grider-columns} {
+					@include grider-offset($column);
+				}
+				$column: $column - 1;
+			}
+		}
+	}
+
+}
